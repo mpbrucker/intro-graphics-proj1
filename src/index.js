@@ -1,0 +1,2 @@
+
+loadOBJ('../obj/diamond.obj')
