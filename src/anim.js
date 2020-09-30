@@ -34,6 +34,11 @@ var FSHADER_SOURCE =
 var ANGLE_STEP = 45.0;
 
 function main() {
+  loadOBJ('../obj/diamond.obj').then(data => mainLoop(data));
+}
+
+
+function mainLoop(vertData) {
 //==============================================================================
   // Retrieve <canvas> element
   var canvas = document.getElementById('webgl');
@@ -54,7 +59,7 @@ function main() {
   // Write the positions of vertices into an array, transfer
   // array contents to a Vertex Buffer Object created in the
   // graphics hardware.
-  var n = initVertexBuffers(gl);
+  var n = initVertexBuffers(gl, vertData);
   if (n < 0) {
     console.log('Failed to set the positions of the vertices');
     return;
@@ -84,17 +89,18 @@ function main() {
   tick();
 }
 
-function initVertexBuffers(gl) {
+function initVertexBuffers(gl, vertData) {
+  var vertices = new Float32Array(vertData);
 //==============================================================================
-  var vertices = new Float32Array ([
-     0.00, 0.00, 0.00, 1.00,		// first triangle   (x,y,z,w==1)
-     0.19, 0.00, 0.00, 1.00,  
-     0.0,  0.49, 0.00, 1.00,
-     0.20, 0.01, 0.00, 1.00,		// second triangle
-     0.20, 0.50, 0.00, 1.00,
-     0.01, 0.50, 0.00, 1.00,
-  ]);
-  var n = 6;   // The number of vertices
+  // var vertices = new Float32Array ([
+  //    0.00, 0.00, 0.00, 1.00,		// first triangle   (x,y,z,w==1)
+  //    0.19, 0.00, 0.00, 1.00,  
+  //    0.0,  0.49, 0.00, 1.00,
+  //    0.20, 0.01, 0.00, 1.00,		// second triangle
+  //    0.20, 0.50, 0.00, 1.00,
+  //    0.01, 0.50, 0.00, 1.00,
+  // ]);
+  var n = 60;   // The number of vertices
 
   // Create a buffer object
   var vertexBuffer = gl.createBuffer();
@@ -156,7 +162,7 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
   		// Draw the rectangle held in the VBO we created in initVertexBuffers().
 
 
-  gl.drawArrays(gl.TRIANGLES, 0, n);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
 
 
   //-------Draw Upper Arm----------------
@@ -176,7 +182,7 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
   						// we translate by the 0.1, not 0.1*0.6.)
   // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  gl.drawArrays(gl.TRIANGLES, 0, n);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
  
 
 	modelMatrix.translate(0.1, 0.5, 0.0);	// Make new drawing axes at 
@@ -213,7 +219,7 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
 	// Draw inner lower jaw segment:				
   // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  gl.drawArrays(gl.TRIANGLES, 0, n);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
 
 	// Now move drawing axes to the centered end of that lower-jaw segment:
 	modelMatrix.translate(0.1, 0.5, 0.0);
@@ -223,7 +229,7 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
 	// Draw outer lower jaw segment:				
   // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  gl.drawArrays(gl.TRIANGLES, 0, n);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
   
   // RETURN to the saved drawing axes at the 'wrist':
 	// RETRIEVE PREVIOUSLY-SAVED DRAWING AXES HERE:
@@ -243,7 +249,7 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
 	// Draw inner upper jaw segment:				(same as for lower jaw)
   // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  gl.drawArrays(gl.TRIANGLES, 0, n);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
 
 	// Now move drawing axes to the centered end of that upper-jaw segment:
 	modelMatrix.translate(0.1, 0.5, 0.0);
@@ -254,7 +260,7 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
 	// Draw outer upper jaw segment:		(same as for lower jaw)		
   // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  gl.drawArrays(gl.TRIANGLES, 0, n);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
 }
 
 // Last time that this function was called:  (used for animation timing)

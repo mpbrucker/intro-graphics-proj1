@@ -1,9 +1,8 @@
 
 function loadOBJ(filename) {
-    fetch(filename).then(
+    return fetch(filename).then(
         response => response.text())
         .then(data => {
-            console.log(data);
             var vertices = [];
             var triangles = [];
 
@@ -29,8 +28,9 @@ function loadOBJ(filename) {
                         triangles.push(vertices[parsedVerts[i+1]-1]);
                         triangles.push(1.0);
                     }
-                    console.log(triangles.flat())
                 }
             }
+
+            return triangles.flat();
         })
 }
