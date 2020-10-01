@@ -34,7 +34,7 @@ var FSHADER_SOURCE =
 var ANGLE_STEP = 45.0;
 
 function main() {
-  loadOBJ('../obj/diamond.obj').then(data => mainLoop(data));
+  loadOBJ('../obj/cow.obj').then(data => mainLoop(data));
 }
 
 
@@ -45,6 +45,8 @@ function mainLoop(vertData) {
 
   // Get the rendering context for WebGL
   var gl = getWebGLContext(canvas);
+  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+
   if (!gl) {
     console.log('Failed to get the rendering context for WebGL');
     return;
@@ -100,7 +102,7 @@ function initVertexBuffers(gl, vertData) {
   //    0.20, 0.50, 0.00, 1.00,
   //    0.01, 0.50, 0.00, 1.00,
   // ]);
-  var n = 60;   // The number of vertices
+  var n = vertData.length / 4;   // The number of vertices
 
   // Create a buffer object
   var vertexBuffer = gl.createBuffer();
@@ -146,7 +148,10 @@ function draw(gl, n, currentAngle, modelMatrix, u_ModelMatrix) {
 
   // Build our Robot Arm by successively moving our drawing axes
   //-------Draw Lower Arm---------------
-  modelMatrix.setTranslate(-0.4,-0.4, 0.0);  // 'set' means DISCARD old matrix,
+  modelMatrix.setScale(0.2,0.2,0.2);
+  var aspect = gl.canvas.width / gl.canvas.height;
+  modelMatrix.scale(1.0, aspect, 1.0);
+  modelMatrix.translate(-0.4,-0.4, 0.0);  // 'set' means DISCARD old matrix,
   						// (drawing axes centered in CVV), and then make new
   						// drawing axes moved to the lower-left corner of CVV. 
   
