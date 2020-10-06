@@ -133,6 +133,16 @@ function initVertexBuffers(gl, vertData) {
   return n;
 }
 
+function printMat4(matrix) {
+  var elems = matrix.elements;
+  console.log(`
+  ${elems[0].toFixed(2)} ${elems[4].toFixed(2)} ${elems[8].toFixed(2)} ${elems[12].toFixed(2)}
+  ${elems[1].toFixed(2)} ${elems[5].toFixed(2)} ${elems[9].toFixed(2)} ${elems[13].toFixed(2)}
+  ${elems[2].toFixed(2)} ${elems[6].toFixed(2)} ${elems[10].toFixed(2)} ${elems[14].toFixed(2)}
+  ${elems[3].toFixed(2)} ${elems[7].toFixed(2)} ${elems[11].toFixed(2)} ${elems[15].toFixed(2)}
+  `)
+}
+
 function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 //==============================================================================
   // Clear <canvas>
@@ -142,22 +152,15 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
   //-------Draw Lower Arm---------------
   var aspect = gl.canvas.width / gl.canvas.height;
   modelMatrix.setIdentity();
-  modelMatrix.scale(0.1,0.1*aspect,0.1);
+  modelMatrix.scale(0.1,0.1,0.1*1);
+  // modelMatrix.scale(2,2,1);
+  printMat4(modelMatrix);
   modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);  // 'set' means DISCARD old matrix,
   						// (drawing axes centered in CVV), and then make new
   						// drawing axes moved to the lower-left corner of CVV. 
   
-  modelMatrix.rotate(animProperties.angle, 0, 1, 0);  // Make new drawing axes that
-  						// that spin around z axis (0,0,1) of the previous 
-  						// drawing axes, using the same origin.
-	// modelMatrix.translate(-0.1, 0,0);						// Move box so that we pivot
-							// around the MIDDLE of it's lower edge, and not the left corner.
-  // DRAW BOX:  Use this matrix to transform & draw our VBo's contents:
-  		// Pass our current matrix to the vertex shaders:
+  modelMatrix.rotate(animProperties.angle, 0, 1, 0);  // Spin around Y axis
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-  		// Draw the rectangle held in the VBO we created in initVertexBuffers().
-
-
   gl.drawArrays(gl.LINE_STRIP, 0, n);
 
 
