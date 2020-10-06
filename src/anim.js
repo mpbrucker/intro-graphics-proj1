@@ -145,7 +145,6 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 //==============================================================================
   // Clear <canvas>
   gl.clear(gl.COLOR_BUFFER_BIT);
-  console.log(animProperties.yOffset)
 
   // Build our Robot Arm by successively moving our drawing axes
   //-------Draw Lower Arm---------------
@@ -281,7 +280,7 @@ function animate(properties) {
   
   // Calculate current state variables
   var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
-  var yOffset = Math.sin(now / 1000) * 0.01;
+  var yOffset = Math.sin(now / 100) * 0.2;
   return {angle: newAngle % 360, yOffset: yOffset};
 }
 
