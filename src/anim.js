@@ -34,7 +34,7 @@ var FSHADER_SOURCE =
 var ANGLE_STEP = 45.0;
 
 function main() {
-  loadOBJ('../obj/cow.obj').then(data => mainLoop(data));
+  loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
 }
 
 
@@ -94,14 +94,6 @@ function mainLoop(vertData) {
 function initVertexBuffers(gl, vertData) {
   var vertices = new Float32Array(vertData);
 //==============================================================================
-  // var vertices = new Float32Array ([
-  //    0.00, 0.00, 0.00, 1.00,		// first triangle   (x,y,z,w==1)
-  //    0.19, 0.00, 0.00, 1.00,  
-  //    0.0,  0.49, 0.00, 1.00,
-  //    0.20, 0.01, 0.00, 1.00,		// second triangle
-  //    0.20, 0.50, 0.00, 1.00,
-  //    0.01, 0.50, 0.00, 1.00,
-  // ]);
   var n = vertData.length / 4;   // The number of vertices
 
   // Create a buffer object
@@ -148,18 +140,17 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 
   // Build our Robot Arm by successively moving our drawing axes
   //-------Draw Lower Arm---------------
-  modelMatrix.setScale(0.2,0.2,0.2);
   var aspect = gl.canvas.width / gl.canvas.height;
-  modelMatrix.scale(1.0, aspect, 1.0);
-  modelMatrix.translate(-0.4,-0.4 + animProperties.yOffset, 0.0);  // 'set' means DISCARD old matrix,
+  modelMatrix.setIdentity();
+  modelMatrix.scale(0.1,0.1*aspect,0.1);
+  modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);  // 'set' means DISCARD old matrix,
   						// (drawing axes centered in CVV), and then make new
   						// drawing axes moved to the lower-left corner of CVV. 
   
-  modelMatrix.rotate(animProperties.angle, 0, 45.0, 1);  // Make new drawing axes that
+  modelMatrix.rotate(animProperties.angle, 0, 1, 0);  // Make new drawing axes that
   						// that spin around z axis (0,0,1) of the previous 
   						// drawing axes, using the same origin.
-  //modelMatrix.rotate(3*currentAngle, 0,1,0);  // SPIN ON Y AXIS!!!
-	modelMatrix.translate(-0.1, 0,0);						// Move box so that we pivot
+	// modelMatrix.translate(-0.1, 0,0);						// Move box so that we pivot
 							// around the MIDDLE of it's lower edge, and not the left corner.
   // DRAW BOX:  Use this matrix to transform & draw our VBo's contents:
   		// Pass our current matrix to the vertex shaders:
