@@ -61,6 +61,7 @@ function mainLoop(vertData) {
   // Write the positions of vertices into an array, transfer
   // array contents to a Vertex Buffer Object created in the
   // graphics hardware.
+  printVertProperties(vertData)
   var n = initVertexBuffers(gl, vertData);
   if (n < 0) {
     console.log('Failed to set the positions of the vertices');
@@ -152,16 +153,29 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
   //-------Draw Lower Arm---------------
   var aspect = gl.canvas.width / gl.canvas.height;
   modelMatrix.setIdentity();
-  modelMatrix.scale(0.1,0.1,0.1*1);
-  // modelMatrix.scale(2,2,1);
-  printMat4(modelMatrix);
+  modelMatrix.scale(0.1,0.1*aspect,0.1);
   modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);  // 'set' means DISCARD old matrix,
-  						// (drawing axes centered in CVV), and then make new
-  						// drawing axes moved to the lower-left corner of CVV. 
-  
-  modelMatrix.rotate(animProperties.angle, 0, 1, 0);  // Spin around Y axis
+  modelMatrix.rotate(animProperties.angle, 0, 0, 1);  // Spin around Y axis
+
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
   gl.drawArrays(gl.LINE_STRIP, 0, n);
+  pushMatrix(modelMatrix);
+
+  // DRAW LEFT LEG
+  modelMatrix.translate(0,-2.3, -1.3);  // 'set' means DISCARD old matrix,
+  modelMatrix.scale(0.2,1,0.2);
+  modelMatrix.rotate(-animProperties.angle, 0, 1, 0);  // Spin around Y axis
+
+  gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+  gl.drawArrays(gl.LINE_STRIP, 0, n);
+
+
+
+
+  // printMat4(modelMatrix);
+
+
+  
 
 
   // //-------Draw Upper Arm----------------
