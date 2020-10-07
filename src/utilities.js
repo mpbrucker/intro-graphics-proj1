@@ -22,11 +22,11 @@ function loadOBJ(filename) {
                     // triangle-ification method adapted from https://stackoverflow.com/questions/23723993/converting-quadriladerals-in-an-obj-file-into-triangles
                     for (let i=1; i<parsedVerts.length-1; i++) { // Next, we break the list of vertices into triangles
                         triangles.push(vertices[parsedVerts[0]-1]); 
-                        triangles.push(1.0);
+                        triangles.push([1.0, 1.0, 0.0, 0.0]);
                         triangles.push(vertices[parsedVerts[i]-1]);
-                        triangles.push(1.0);
+                        triangles.push([1.0, 0.0, 1.0, 0.0]);
                         triangles.push(vertices[parsedVerts[i+1]-1]);
-                        triangles.push(1.0);
+                        triangles.push([1.0, 0.0, 0.0, 1.0]);
                     }
                 }
             }
