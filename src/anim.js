@@ -62,9 +62,9 @@ function mainLoop(vertData) {
     // Specify the color for clearing <canvas>
     gl.clearColor(0, 0, 0, 1);
 
-    gl.enable(gl.DEPTH_TEST);
-    gl.clearDepth(0.0);
-    gl.depthFunc(gl.GREATER);
+    // gl.enable(gl.DEPTH_TEST);
+    // gl.clearDepth(0.0);
+    // gl.depthFunc(gl.GREATER);
 
     // Get storage location of u_ModelMatrix
     var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
@@ -90,7 +90,6 @@ function mainLoop(vertData) {
 function initVertexBuffers(gl, vertData) {
     var vertices = new Float32Array(vertData);
     console.log(vertData)
-//==============================================================================
     var n = vertData.length / 7;     // Divide by the number of items per vertex
 
     // Create a buffer object
@@ -150,12 +149,12 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     //-------Draw Lower Arm---------------
     var aspect = gl.canvas.width / gl.canvas.height;
     modelMatrix.setIdentity();
-    modelMatrix.scale(0.1,0.1*aspect,-0.1);
+    modelMatrix.scale(0.1,0.1*aspect,0.1);
     modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
     modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.drawArrays(gl.LINE_STRIP, 0, n);
+    gl.drawArrays(gl.TRIANGLES, 0, n);
     pushMatrix(modelMatrix);
 
     // DRAW LEFT LEG
@@ -165,7 +164,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix.translate(0,-3.15,0)
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.drawArrays(gl.LINE_STRIP, 0, n);
+    gl.drawArrays(gl.TRIANGLES, 0, n);
 
     modelMatrix = popMatrix();
 
@@ -176,7 +175,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix.translate(0,-3.15,0)
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.drawArrays(gl.LINE_STRIP, 0, n);
+    gl.drawArrays(gl.TRIANGLES, 0, n);
     
 
 
