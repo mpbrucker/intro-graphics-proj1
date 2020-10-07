@@ -2,29 +2,19 @@
 var VSHADER_SOURCE =`
     attribute vec4 a_Position;
     uniform mat4 u_ModelMatrix;
+    attribute vec4 a_Color;
+    varying vec4 v_Color;
     void main() {
         gl_Position = u_ModelMatrix * a_Position;
-    }
-`
-// Each instance computes all the on-screen attributes for just one VERTEX,
-// specifying that vertex so that it can be used as part of a drawing primitive
-// depicted in the CVV coord. system (+/-1, +/-1, +/-1) that fills our HTML5
-// 'canvas' object. This GPU program gets all its info for that vertex through 
-// the 'attribute vec4' variable a_Position, which feeds it values for one 
-// vertex taken from from the Vertex Buffer Object (VBO) we created inside the 
-// graphics hardware ('GPU') by calling the 'initVertexBuffers()' function.
-// 		The 'uniform' variable u_ModelMatrix in 
-//
-//    ?What other vertex attributes can you set within a Vertex Shader? Color?
-//    surface normal? texture coordinates?
-//    ?How could you set each of these attributes separately for each vertex in
-//    our VBO?  Could you store them in the VBO? Use them in the Vertex Shader?
-
+        gl_PointSize = 10.0;
+        v_Color = a_Color;
+    }`;
 // Fragment shader program----------------------------------
-var FSHADER_SOURCE =
-  'void main() {\n' +
-  '  gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0);\n' +
-  '}\n';
+var FSHADER_SOURCE =`
+  varying vec4 v_Color;
+  void main() {
+    gl_FragColor = v_Color;
+  }`;
 //  Each instance computes all the on-screen attributes for just one PIXEL.
 // here we do the bare minimum: if we draw any part of any drawing primitive in 
 // any pixel, we simply set that pixel to the constant color specified here.
@@ -71,6 +61,9 @@ function mainLoop(vertData) {
   // Specify the color for clearing <canvas>
   gl.clearColor(0, 0, 0, 1);
 
+  gl.depthFunc(gl.LESS);
+	gl.enable(gl.DEPTH_TEST);
+
   // Get storage location of u_ModelMatrix
   var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
   if (!u_ModelMatrix) { 
@@ -98,38 +91,37 @@ function initVertexBuffers(gl, vertData) {
   var n = vertData.length / 4;   // The number of vertices
 
   // Create a buffer object
-  var vertexBuffer = gl.createBuffer();
-  if (!vertexBuffer) {
+  var shapeBuffer = gl.createBuffer();
+  if (!shapeBuffer) {
     console.log('Failed to create the buffer object');
     return -1;
   }
 
   // Bind the buffer object to target
-  gl.bindBuffer(gl.ARRAY_BUFFER, vertexBuffer);
+  gl.bindBuffer(gl.ARRAY_BUFFER, shapeBuffer);
   // Write date into the buffer object
   gl.bufferData(gl.ARRAY_BUFFER, vertices, gl.STATIC_DRAW);
 
-  // Assign the buffer object to a_Position variable
+  // Get the number of bytes per elem in vertices array
+  var FSIZE = vertices.BYTES_PER_ELEMENT;
+
+  // Assign the position data in the buffer object to a_Position variable
   var a_Position = gl.getAttribLocation(gl.program, 'a_Position');
   if(a_Position < 0) {
     console.log('Failed to get the storage location of a_Position');
     return -1;
   }
-  gl.vertexAttribPointer(a_Position, 4, gl.FLOAT, false, 0, 0);
-	// websearch yields OpenGL version: 
-	//		http://www.opengl.org/sdk/docs/man/xhtml/glVertexAttribPointer.xml
-				//	glVertexAttributePointer (
-				//			index == which attribute variable will we use?
-				//			size == how many dimensions for this attribute: 1,2,3 or 4?
-				//			type == what data type did we use for those numbers?
-				//			isNormalized == are these fixed-point values that we need
-				//						normalize before use? true or false
-				//			stride == #bytes (of other, interleaved data) between OUR values?
-				//			pointer == offset; how many (interleaved) values to skip to reach
-				//					our first value?
-				//				)
-  // Enable the assignment to a_Position variable
+  gl.vertexAttribPointer(a_Position, 4, gl.FLOAT, false, FSIZE * 7, 0);
   gl.enableVertexAttribArray(a_Position);
+
+  // Assign the color data in the buffer object to a_Position variable
+  var a_Color = gl.getAttribLocation(gl.program, 'a_Color');
+  if(a_Color < 0) {
+    console.log('Failed to get the storage location of a_Color');
+    return -1;
+  }
+  gl.vertexAttribPointer(a_Color, 4, gl.FLOAT, false, FSIZE * 7, FSIZE * 4);
+  gl.enableVertexAttribArray(a_Color);
 
   return n;
 }
@@ -153,7 +145,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
   //-------Draw Lower Arm---------------
   var aspect = gl.canvas.width / gl.canvas.height;
   modelMatrix.setIdentity();
-  modelMatrix.scale(0.1,0.1*aspect,0.1);
+  modelMatrix.scale(0.1,0.1*aspect,-0.1);
   modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);  // 'set' means DISCARD old matrix,
   modelMatrix.rotate(animProperties.angle, 0, 1, 0);  // Spin around Y axis
 
@@ -175,7 +167,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
   // DRAW RIGHT LEG
   modelMatrix.translate(0,0, 1.3);  // 'set' means DISCARD old matrix,
   modelMatrix.scale(0.1,1,0.2);
-  modelMatrix.rotate(animProperties.yOffset*50, 0, 0, 1);  // Spin around Y axis
+  modelMatrix.rotate(animProperties.yOffset*100, 0, 0, 1);  // Spin around Y axis
   modelMatrix.translate(0,-3.15,0)
 
   gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
