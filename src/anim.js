@@ -24,8 +24,51 @@ var FSHADER_SOURCE =`
 // Global Variable -- Rotation angle rate (degrees/second)
 var ANGLE_STEP = 45.0;
 
+function genTrianglePrism(w,h,d) {
+    return [
+        // Front face
+        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
+        0.0, h/2, d/2, 1.0, 1.0, 1.0, 0.0,
+        -w/2, -h/2, d/2, 1.0, 1.0, 1.0, 1.0,
+
+        // Back face
+        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0,
+        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
+        -w/2, -h/2, -d/2, 1.0, 1.0, 1.0, 1.0,
+
+        // Top right face
+        0.0, h/2, d/2, 1.0, 1.0, 1.0, 0.0,
+        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
+        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
+
+        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
+        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
+        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0, 
+
+        // Top left face
+        0.0, h/2, d/2, 1.0, 1.0, 1.0, 0.0,
+        -w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
+        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
+
+        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
+        -w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
+        -w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0, 
+
+        // Bottom face
+        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
+        -w/2, -h/2, d/2, 1.0, 1.0, 1.0, 1.0,
+        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0,
+
+        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0,
+        -w/2, -h/2, -d/2, 1.0, 1.0, 1.0, 1.0,
+        -w/2, -h/2, d/2, 1.0, 1.0, 1.0, 1.0,
+    ]
+}
+
 function main() {
-    loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
+    // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
+    var vertData = genTrianglePrism(1,2,0.5);
+    mainLoop(vertData)
 }
 
 
@@ -42,6 +85,11 @@ function mainLoop(vertData) {
         console.log('Failed to get the rendering context for WebGL');
         return;
     }
+
+    gl.enable(gl.DEPTH_TEST); // enabled by default, but let's be SURE.
+    gl.clearDepth(0.0); // each time we 'clear' our depth buffer, set all
+    //     // pixel depths to 0.0 (1.0 is DEFAULT)
+    gl.depthFunc(gl.LESS); // (gl.LESS is DEFAULT; reverse it!)
 
     // Initialize shaders
     if (!initShaders(gl, VSHADER_SOURCE, FSHADER_SOURCE)) {
@@ -61,10 +109,6 @@ function mainLoop(vertData) {
 
     // Specify the color for clearing <canvas>
     gl.clearColor(0, 0, 0, 1);
-
-    // gl.enable(gl.DEPTH_TEST);
-    // gl.clearDepth(0.0);
-    // gl.depthFunc(gl.GREATER);
 
     // Get storage location of u_ModelMatrix
     var u_ModelMatrix = gl.getUniformLocation(gl.program, 'u_ModelMatrix');
