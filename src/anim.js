@@ -26,7 +26,7 @@ var ANGLE_STEP = 45.0;
 
 function main() {
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
-    var vertData = genTrapezoidPrism(1,0.7,1,5);
+    var vertData = genTrapezoidPrism(1,0.7,1,1);
     mainLoop(vertData)
 }
 
@@ -152,33 +152,35 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     //-------Draw Lower Arm---------------
     var aspect = gl.canvas.width / gl.canvas.height;
     modelMatrix.setIdentity();
-    modelMatrix.scale(0.1,0.1*aspect,-0.1);
+    modelMatrix.scale(1,1,-1); // TODO figure out how to get the reverse depth buffering working
+    modelMatrix.scale(0.1,0.1*aspect,0.1);
     modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
     modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
-
-    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.drawArrays(gl.TRIANGLES, 0, n);
     pushMatrix(modelMatrix);
 
-    // DRAW LEFT LEG
-    modelMatrix.translate(0,0, -1.3);    // 'set' means DISCARD old matrix,
-    modelMatrix.scale(0.1,1,0.2);
-    modelMatrix.rotate(-animProperties.yOffset*50, 0, 0, 1);    // Spin around Y axis
-    modelMatrix.translate(0,-3.15,0)
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     gl.drawArrays(gl.TRIANGLES, 0, n);
 
-    modelMatrix = popMatrix();
+    // // DRAW LEFT LEG
+    // modelMatrix.translate(0,0, -1.3);    // 'set' means DISCARD old matrix,
+    // modelMatrix.scale(0.1,1,0.2);
+    // modelMatrix.rotate(-animProperties.yOffset*50, 0, 0, 1);    // Spin around Y axis
+    // modelMatrix.translate(0,-3.15,0)
 
-    // DRAW RIGHT LEG
-    modelMatrix.translate(0,0, 1.3);    // 'set' means DISCARD old matrix,
-    modelMatrix.scale(0.1,1,0.2);
-    modelMatrix.rotate(animProperties.yOffset*100, 0, 0, 1);    // Spin around Y axis
-    modelMatrix.translate(0,-3.15,0)
+    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    // gl.drawArrays(gl.TRIANGLES, 0, n);
 
-    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.drawArrays(gl.TRIANGLES, 0, n);
+    // modelMatrix = popMatrix();
+
+    // // DRAW RIGHT LEG
+    // modelMatrix.translate(0,0, 1.3);    // 'set' means DISCARD old matrix,
+    // modelMatrix.scale(0.1,1,0.2);
+    // modelMatrix.rotate(animProperties.yOffset*100, 0, 0, 1);    // Spin around Y axis
+    // modelMatrix.translate(0,-3.15,0)
+
+    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    // gl.drawArrays(gl.TRIANGLES, 0, n);
     
 
 
