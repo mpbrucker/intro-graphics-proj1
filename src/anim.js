@@ -23,15 +23,35 @@ var FSHADER_SOURCE =`
 
 // Global Variable -- Rotation angle rate (degrees/second)
 var ANGLE_STEP = 45.0;
-var xDesired = 0.5;
-var yDesired = 0.3;
+var xDesired = 0.0;
+var yDesired = 0.0;
 var ratio = 1;
 
 function main() {
+    window.addEventListener("mousedown", myMouseDown)
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
     var vertData = genTrapezoidPrism(1,0.7,1,1).concat(genTrianglePrism(1,1,1)); 
     mainLoop(vertData)
 }
+
+var g_canvas = document.getElementById('webgl');     
+function myMouseDown(ev) {
+    var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
+    var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
+    var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
+
+    var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
+    var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
+
+    var xDiff = xDesired - x;
+    var yDiff = yDesired - y+0.0001;
+    ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
+    if (ratio > 5 || ratio == 0) ratio = 5;
+    console.log(ratio)
+
+    xDesired = x;
+    yDesired = y;
+};
 
 
 function mainLoop(vertData) {

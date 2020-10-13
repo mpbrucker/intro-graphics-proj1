@@ -1,3 +1,4 @@
+
 function genTrianglePrism(w,h,d) {
     return [
         // Front face
