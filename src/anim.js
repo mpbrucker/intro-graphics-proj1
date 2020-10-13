@@ -26,7 +26,7 @@ var ANGLE_STEP = 45.0;
 
 function main() {
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
-    var vertData = genTrapezoidPrism(1,0.7,1,1);
+    var vertData = genTrapezoidPrism(1,0.7,1,1).concat(genTrianglePrism(1,1,1)); 
     mainLoop(vertData)
 }
 
@@ -143,6 +143,14 @@ function printMat4(matrix) {
     `)
 }
 
+function drawTrapezoid(gl) {
+    gl.drawArrays(gl.TRIANGLES, 0, 36);
+}
+
+function drawTriangle(gl) {
+    gl.drawArrays(gl.TRIANGLES, 36, 24);
+}
+
 function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 //==============================================================================
     // Clear <canvas>
@@ -157,10 +165,11 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
     modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
     pushMatrix(modelMatrix);
+    modelMatrix.scale(2,1,1);
 
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    gl.drawArrays(gl.TRIANGLES, 0, n);
+    drawTriangle(gl)
 
     // // DRAW LEFT LEG
     // modelMatrix.translate(0,0, -1.3);    // 'set' means DISCARD old matrix,
