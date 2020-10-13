@@ -163,7 +163,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix.scale(1,1,-1); // TODO figure out how to get the reverse depth buffering working
     modelMatrix.scale(0.1,0.1*aspect,0.1);
     // modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
-    // modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
+    modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
     pushMatrix(modelMatrix);
     modelMatrix.scale(2,1,1);
 
@@ -171,146 +171,65 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     drawTrapezoid(gl)
 
-    // // DRAW RIGHT LEG
+    // DRAW RIGHT LEG JOINT
     modelMatrix = popMatrix();
+    modelMatrix.translate(1,0,0); 
+    modelMatrix.rotate(animProperties.yOffset*100, 1, 0, 0);   
     pushMatrix(modelMatrix);
-    modelMatrix.translate(1,0,0);    
+   
     modelMatrix.scale(0.6,1,1);
     // modelMatrix.rotate(26.57, 0, 0, 1);    
-    modelMatrix.rotate(animProperties.yOffset*100, 1, 0, 0);   
     // modelMatrix.rotate(-26.57, 0, 0, 1);    
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     drawTriangle(gl);
 
-    // // DRAW LEFT LEG
+    // DRAW RIGHT LEG FIRST LIMB
     modelMatrix = popMatrix();
+    modelMatrix.translate(0,-1.25,0); 
+    modelMatrix.rotate(90, 0, 1, 0);
     pushMatrix(modelMatrix);
-    modelMatrix.translate(-1,0,0);    
-    modelMatrix.scale(0.6,1,1);
-    // modelMatrix.rotate(26.57, 0, 0, 1);    
-    modelMatrix.rotate(-animProperties.yOffset*100, 1, 0, 0);   
-    // modelMatrix.rotate(-26.57, 0, 0, 1);    
+    modelMatrix.scale(1,1.5,0.6);  
+
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    drawTriangle(gl)
+    drawTrapezoid(gl);
 
-    // modelMatrix = popMatrix();
-
-    // // DRAW RIGHT LEG
-    // modelMatrix.translate(0,0, 1.3);    // 'set' means DISCARD old matrix,
-    // modelMatrix.scale(0.1,1,0.2);
-    // modelMatrix.rotate(animProperties.yOffset*100, 0, 0, 1);    // Spin around Y axis
-    // modelMatrix.translate(0,-3.15,0)
-
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.TRIANGLES, 0, n);
-    
-
-
-
-
-
-    // printMat4(modelMatrix);
-
-
-    
-
-
-    // //-------Draw Upper Arm----------------
-    // modelMatrix.translate(0.1, 0.5, 0); 			// Make new drawing axes that
-    // 						// we moved upwards (+y) measured in prev. drawing axes, and
-    // 						// moved rightwards (+x) by half the width of the box we just drew.
-    // modelMatrix.scale(0.6,0.6,0.6);				// Make new drawing axes that
-    // 						// are smaller that the previous drawing axes by 0.6.
-    // modelMatrix.rotate(currentAngle*0.8, 0,0,1);	// Make new drawing axes that
-    // 						// spin around Z axis (0,0,1) of the previous drawing 
-    // 						// axes, using the same origin.
-    // modelMatrix.translate(-0.1, 0, 0);			// Make new drawing axes that
-    // 						// move sideways by half the width of our rectangle model
-    // 						// (REMEMBER! modelMatrix.scale() DIDN'T change the 
-    // 						// the vertices of our model stored in our VBO; instead
-    // 						// we changed the DRAWING AXES used to draw it. Thus
-    // 						// we translate by the 0.1, not 0.1*0.6.)
-    // // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
+    // DRAW RIGHT LEG SECOND LIMB
+    modelMatrix = popMatrix();
+    modelMatrix.translate(0,-1.5,0);
+    modelMatrix.rotate((0.2+animProperties.yOffset)*50, 0, 0, 1);
  
+    pushMatrix(modelMatrix);
+    modelMatrix.scale(0.75,1.5,0.6);  
+    // modelMatrix.rotate(180, 0, 0, 1);
 
-	// modelMatrix.translate(0.1, 0.5, 0.0);	// Make new drawing axes at 
-	// 					    // the robot's "wrist" -- at the center top of upper arm
-	
-	// // SAVE CURRENT DRAWING AXES HERE--------------------------
-	// //    copy current matrix so that we can return to these same drawing axes
-	// // later, when we draw the UPPER jaw of the robot pincer.    HOW?
-	// // Try a 'push-down stack'.    We want to 'push' our current modelMatrix
-	// // onto the stack to save it; then later 'pop' when we're ready to draw
-	// // the upper pincer.
-	// //----------------------------------------------------------
-	// pushMatrix(modelMatrix);
-	// //-----------------------------------------------------------
-	// // CAUTION!    Instead of our textbook's matrix library 
-	// //    (WebGL Programming Guide:    
-	// //
-	// //				lib/cuon-matrix.js
-	// //
-	// // be sure your HTML file loads this MODIFIED matrix library:
-	// //
-	// //				cuon-matrix-mod.js
-	// // where Adrien Katsuya Tateno (your diligent classmate in EECS351)
-	// // has added push-down matrix-stack functions 'push' and 'pop'.
-	// //--------------------------------------------------------------
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTrapezoid(gl);
 
-	// //=========Draw lower jaw of robot pincer============================
-	// modelMatrix.rotate(-25.0 +0.5* currentAngle, 0,0,1);		
-	// 					// make new drawing axes that rotate for lower-jaw
-	// modelMatrix.scale(0.4, 0.4, 0.4);		// Make new drawing axes that
-	// 					// have size of just 40% of previous drawing axes,
-	// 					// (Then translate? no need--we already have the box's 
-	// 					//	left corner at the wrist-point; no change needed.)
-	// // Draw inner lower jaw segment:				
-    // // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
+    // DRAW RIGHT LEG FOOT
+    modelMatrix = popMatrix();
+    modelMatrix.translate(-.315,-.875,0); 
+    modelMatrix.scale(1.5,0.25,0.6);  
+    modelMatrix.rotate(180, 0, 0, 1)
+
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTrapezoid(gl);
+
+
+
+
+    // // DRAW LEFT LEG
+    // modelMatrix = popMatrix();
+    // pushMatrix(modelMatrix);
+    // modelMatrix.translate(-1,0,0);    
+    // modelMatrix.scale(0.6,1,1);
+    // // modelMatrix.rotate(26.57, 0, 0, 1);    
+    // modelMatrix.rotate(-animProperties.yOffset*100, 1, 0, 0);   
+    // // modelMatrix.rotate(-26.57, 0, 0, 1);    
     // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
+    // drawTriangle(gl)
 
-	// // Now move drawing axes to the centered end of that lower-jaw segment:
-	// modelMatrix.translate(0.1, 0.5, 0.0);
-	// modelMatrix.rotate(40.0, 0,0,1);		// make bend in the lower jaw
-	// modelMatrix.translate(-0.1, 0.0, 0.0);	// re-center the outer segment,
-	 
-	// // Draw outer lower jaw segment:				
-    // // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
     
-    // // RETURN to the saved drawing axes at the 'wrist':
-	// // RETRIEVE PREVIOUSLY-SAVED DRAWING AXES HERE:
-	// //---------------------
-	// modelMatrix = popMatrix();
-	// //----------------------
-	
-	// //=========Draw lower jaw of robot pincer============================
-	// // (almost identical to the way I drew the upper jaw)
-	// modelMatrix.rotate(25.0 -0.5* currentAngle, 0,0,1);		
-	// 					// make new drawing axes that rotate upper jaw symmetrically
-	// 					// with lower jaw: changed sign of 15.0 and of 0.5
-	// modelMatrix.scale(0.4, 0.4, 0.4);		// Make new drawing axes that
-	// 					// have size of just 40% of previous drawing axes,
-	// modelMatrix.translate(-0.2, 0, 0);    // move box LEFT corner at wrist-point.
-	
-	// // Draw inner upper jaw segment:				(same as for lower jaw)
-    // // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
 
-	// // Now move drawing axes to the centered end of that upper-jaw segment:
-	// modelMatrix.translate(0.1, 0.5, 0.0);
-	// modelMatrix.rotate(-40.0, 0,0,1);		// make bend in the upper jaw that
-	// 																		// is opposite of lower jaw (+/-40.0)
-	// modelMatrix.translate(-0.1, 0.0, 0.0);	// re-center the outer segment,
-	 
-	// // Draw outer upper jaw segment:		(same as for lower jaw)		
-    // // DRAW BOX: Use this matrix to transform & draw our VBO's contents:
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.LINE_STRIP, 0, n);
 }
 
 // Last time that this function was called:    (used for animation timing)
@@ -325,7 +244,7 @@ function animate(properties) {
     
     // Calculate current state variables
     var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
-    var yOffset = Math.sin(now / 100) * 0.2;
+    var yOffset = Math.sin(now / 250) * 0.2;
     return {angle: newAngle % 360, yOffset: yOffset};
 }
 
