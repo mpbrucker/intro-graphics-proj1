@@ -162,7 +162,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix.setIdentity();
     modelMatrix.scale(1,1,-1); // TODO figure out how to get the reverse depth buffering working
     modelMatrix.scale(0.1,0.1*aspect,0.1);
-    // modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
+    modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
     modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
     pushMatrix(modelMatrix);
     modelMatrix.scale(2,1,1);
@@ -173,6 +173,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 
     // DRAW RIGHT LEG JOINT
     modelMatrix = popMatrix();
+    pushMatrix(modelMatrix);
     modelMatrix.translate(1,0,0); 
     modelMatrix.rotate(animProperties.yOffset*100, 1, 0, 0);   
     pushMatrix(modelMatrix);
@@ -214,22 +215,49 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     drawTrapezoid(gl);
 
+    // DRAW LEFT LEG JOINT
+    modelMatrix = popMatrix();
+    modelMatrix.translate(-1,0,0); 
+    modelMatrix.rotate(-animProperties.yOffset*100, 1, 0, 0);   
+    pushMatrix(modelMatrix);
+   
+    modelMatrix.scale(0.6,1,1);
+    // modelMatrix.rotate(26.57, 0, 0, 1);    
+    // modelMatrix.rotate(-26.57, 0, 0, 1);    
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTriangle(gl);
 
+    // DRAW LEFT LEG FIRST LIMB
+    modelMatrix = popMatrix();
+    modelMatrix.translate(0,-1.25,0); 
+    modelMatrix.rotate(90, 0, 1, 0);
+    pushMatrix(modelMatrix);
+    modelMatrix.scale(1,1.5,0.6);  
 
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTrapezoid(gl);
 
-    // // DRAW LEFT LEG
-    // modelMatrix = popMatrix();
-    // pushMatrix(modelMatrix);
-    // modelMatrix.translate(-1,0,0);    
-    // modelMatrix.scale(0.6,1,1);
-    // // modelMatrix.rotate(26.57, 0, 0, 1);    
-    // modelMatrix.rotate(-animProperties.yOffset*100, 1, 0, 0);   
-    // // modelMatrix.rotate(-26.57, 0, 0, 1);    
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // drawTriangle(gl)
+    // DRAW LEFT LEG SECOND LIMB
+    modelMatrix = popMatrix();
+    modelMatrix.translate(0,-1.5,0);
+    modelMatrix.rotate((0.2-animProperties.yOffset)*50, 0, 0, 1);
+ 
+    pushMatrix(modelMatrix);
+    modelMatrix.scale(0.75,1.5,0.6);  
+    // modelMatrix.rotate(180, 0, 0, 1);
 
-    
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTrapezoid(gl);
 
+    // DRAW LEFT LEG FOOT
+    modelMatrix = popMatrix();
+    modelMatrix.translate(-.315,-.875,0); 
+    modelMatrix.scale(1.5,0.25,0.6);  
+    modelMatrix.rotate(180, 0, 0, 1)
+
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTrapezoid(gl);
+    console.log(animProperties.yOffset)
 }
 
 // Last time that this function was called:    (used for animation timing)
