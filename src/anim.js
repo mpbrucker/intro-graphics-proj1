@@ -23,6 +23,9 @@ var FSHADER_SOURCE =`
 
 // Global Variable -- Rotation angle rate (degrees/second)
 var ANGLE_STEP = 45.0;
+var xDesired = 0.5;
+var yDesired = 0.3;
+var ratio = 1;
 
 function main() {
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
@@ -77,7 +80,7 @@ function mainLoop(vertData) {
     }
 
     // Current rotation angle
-    var currentAnimProperties = {angle: 0.0, yOffset: 0.0};
+    var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0};
     // Model matrix
     var modelMatrix = new Matrix4();
 
@@ -161,8 +164,10 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     var aspect = gl.canvas.width / gl.canvas.height;
     modelMatrix.setIdentity();
     modelMatrix.scale(1,1,-1); // TODO figure out how to get the reverse depth buffering working
+    modelMatrix.translate(animProperties.xVal, animProperties.yVal, 0.0);    // 'set' means DISCARD old matrix,
+
     modelMatrix.scale(0.1,0.1*aspect,0.1);
-    modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
+    modelMatrix.translate(0,animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
     modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
     pushMatrix(modelMatrix);
     modelMatrix.scale(2,1,1);
@@ -257,7 +262,6 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     drawTrapezoid(gl);
-    console.log(animProperties.yOffset)
 }
 
 // Last time that this function was called:    (used for animation timing)
@@ -269,11 +273,24 @@ function animate(properties) {
     var now = Date.now();
     var elapsed = now - g_last;
     g_last = now;
+
+    var xDiff = xDesired-properties.xVal;
+    var yDiff = yDesired-properties.yVal;
+
+    var newX = properties.xVal;
+    if (Math.abs(xDiff) > 0.01) {
+        newX += 0.0003*elapsed*Math.sign(xDesired-properties.xVal)*ratio;
+    }
+
+    var newY = properties.yVal;
+    if (Math.abs(xDiff) > 0.01) {
+        newY += 0.0003*elapsed*Math.sign(yDesired-properties.yVal);
+    }
     
     // Calculate current state variables
     var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
     var yOffset = Math.sin(now / 250) * 0.2;
-    return {angle: newAngle % 360, yOffset: yOffset};
+    return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY};
 }
 
 function moreCCW() {
