@@ -162,23 +162,36 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix.setIdentity();
     modelMatrix.scale(1,1,-1); // TODO figure out how to get the reverse depth buffering working
     modelMatrix.scale(0.1,0.1*aspect,0.1);
-    modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
-    modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
+    // modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
+    // modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
     pushMatrix(modelMatrix);
     modelMatrix.scale(2,1,1);
 
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    drawTriangle(gl)
+    drawTrapezoid(gl)
+
+    // // DRAW RIGHT LEG
+    modelMatrix = popMatrix();
+    pushMatrix(modelMatrix);
+    modelMatrix.translate(1,0,0);    
+    modelMatrix.scale(0.6,1,1);
+    // modelMatrix.rotate(26.57, 0, 0, 1);    
+    modelMatrix.rotate(animProperties.yOffset*100, 1, 0, 0);   
+    // modelMatrix.rotate(-26.57, 0, 0, 1);    
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTriangle(gl);
 
     // // DRAW LEFT LEG
-    // modelMatrix.translate(0,0, -1.3);    // 'set' means DISCARD old matrix,
-    // modelMatrix.scale(0.1,1,0.2);
-    // modelMatrix.rotate(-animProperties.yOffset*50, 0, 0, 1);    // Spin around Y axis
-    // modelMatrix.translate(0,-3.15,0)
-
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // gl.drawArrays(gl.TRIANGLES, 0, n);
+    modelMatrix = popMatrix();
+    pushMatrix(modelMatrix);
+    modelMatrix.translate(-1,0,0);    
+    modelMatrix.scale(0.6,1,1);
+    // modelMatrix.rotate(26.57, 0, 0, 1);    
+    modelMatrix.rotate(-animProperties.yOffset*100, 1, 0, 0);   
+    // modelMatrix.rotate(-26.57, 0, 0, 1);    
+    gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    drawTriangle(gl)
 
     // modelMatrix = popMatrix();
 
