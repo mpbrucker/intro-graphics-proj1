@@ -24,50 +24,9 @@ var FSHADER_SOURCE =`
 // Global Variable -- Rotation angle rate (degrees/second)
 var ANGLE_STEP = 45.0;
 
-function genTrianglePrism(w,h,d) {
-    return [
-        // Front face
-        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
-        0.0, h/2, d/2, 1.0, 1.0, 1.0, 0.0,
-        -w/2, -h/2, d/2, 1.0, 1.0, 1.0, 1.0,
-
-        // Back face
-        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0,
-        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
-        -w/2, -h/2, -d/2, 1.0, 1.0, 1.0, 1.0,
-
-        // Top right face
-        0.0, h/2, d/2, 1.0, 1.0, 1.0, 0.0,
-        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
-        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
-
-        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
-        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
-        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0, 
-
-        // Top left face
-        0.0, h/2, d/2, 1.0, 1.0, 1.0, 0.0,
-        -w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
-        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
-
-        0.0, h/2, -d/2, 1.0, 1.0, 1.0, 0.0,
-        -w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
-        -w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0, 
-
-        // Bottom face
-        w/2, -h/2, d/2, 1.0, 1.0, 0.0, 0.0,
-        -w/2, -h/2, d/2, 1.0, 1.0, 1.0, 1.0,
-        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0,
-
-        w/2, -h/2, -d/2, 1.0, 1.0, 0.0, 0.0,
-        -w/2, -h/2, -d/2, 1.0, 1.0, 1.0, 1.0,
-        -w/2, -h/2, d/2, 1.0, 1.0, 1.0, 1.0,
-    ]
-}
-
 function main() {
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
-    var vertData = genTrianglePrism(1,2,0.5);
+    var vertData = genTrapezoidPrism(1,0.7,1,5);
     mainLoop(vertData)
 }
 
@@ -193,7 +152,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     //-------Draw Lower Arm---------------
     var aspect = gl.canvas.width / gl.canvas.height;
     modelMatrix.setIdentity();
-    modelMatrix.scale(0.1,0.1*aspect,0.1);
+    modelMatrix.scale(0.1,0.1*aspect,-0.1);
     modelMatrix.translate(-0.4,-0.4+animProperties.yOffset, 0.0);    // 'set' means DISCARD old matrix,
     modelMatrix.rotate(animProperties.angle, 0, 1, 0);    // Spin around Y axis
 
