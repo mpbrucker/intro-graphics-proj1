@@ -26,6 +26,8 @@ var ANGLE_STEP = 45.0;
 var xDesired = 0.0;
 var yDesired = 0.0;
 var ratio = 1;
+var mouseDown = false;
+var flowerRotation = 0;
 
 // Generate random position for flowers
 var flowerPos = [];
@@ -35,28 +37,46 @@ for (var i=0; i<16; i++) {
 
 function main() {
     window.addEventListener("mousedown", myMouseDown)
+    window.addEventListener("mouseup", myMouseUp)
+    window.addEventListener("mousemove", myMouseMove)
+    window.addEventListener("keydown", myKeyDown, true);
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
     var vertData = genTrapezoidPrism(1,0.7,1,1).concat(genTrianglePrism(1,1,1)); 
     mainLoop(vertData)
 }
 
-var g_canvas = document.getElementById('webgl');     
+function myKeyDown() {
+    flowerRotation += 1;
+}
+
+function myMouseUp(ev) {
+    mouseDown = false;
+}
+
 function myMouseDown(ev) {
-    var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
-    var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
-    var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
+    mouseDown = true;
+    myMouseMove(ev);
+}
 
-    var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
-    var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
-
-    var xDiff = xDesired - x;
-    var yDiff = yDesired - y+0.0001;
-    ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
-    if (ratio > 5 || ratio == 0) ratio = 5;
-    console.log(ratio)
-
-    xDesired = x;
-    yDesired = y;
+var g_canvas = document.getElementById('webgl');     
+function myMouseMove(ev) {
+    if (mouseDown) {
+        var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
+        var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
+        var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
+    
+        var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
+        var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
+    
+        var xDiff = xDesired - x;
+        var yDiff = yDesired - y+0.0001;
+        ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
+        if (ratio > 5 || ratio == 0) ratio = 5;
+        console.log(ratio)
+    
+        xDesired = x;
+        yDesired = y;
+    }
 };
 
 
@@ -291,38 +311,32 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     drawTrapezoid(gl);
 
     // DRAW FLOWERS
-    modelMatrix = popMatrix();
-    modelMatrix.translate(0.2, 0.2, -0.5);
-    modelMatrix.scale(0.05,0.05*aspect,0.05);
-    modelMatrix.rotate(-90, 1,0,0)
-
-    pushMatrix(modelMatrix);
-    for (var j=0; j<9; j++) {
-        modelMatrix = popMatrix();
-        modelMatrix.rotate(40, 0,1,0);
+    for (var k=0; k<6; k++) {
+        modelMatrix.setIdentity();
+        modelMatrix.scale(1,1,-1);
         pushMatrix(modelMatrix);
-        for (var i=0; i<8; i++) {
-            modelMatrix.translate(1, 0, 0)
-            modelMatrix.translate(-0.5, 0.5, 0);
-            modelMatrix.rotate(-animProperties.flowerAngle, 0, 0, 1);
-            modelMatrix.translate(0.5, -0.5, 0); 
-            gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-            drawTrapezoid(gl);
+        // console.log(flowerPos[k*2])
+        modelMatrix.translate(flowerPos[k*2], [flowerPos[k*2+1]], -0.5);
+        modelMatrix.scale(0.05,0.05*aspect,0.05);
+        modelMatrix.rotate(-90, 1,0,0);
+        modelMatrix.rotate(flowerRotation, 0, 1, 0);
+    
+        pushMatrix(modelMatrix);
+        for (var j=0; j<9; j++) {
+            modelMatrix = popMatrix();
+            modelMatrix.rotate(40, 0,1,0);
+            pushMatrix(modelMatrix);
+            for (var i=0; i<4; i++) {
+                modelMatrix.translate(1, 0, 0)
+                modelMatrix.translate(-0.5, 0.5, 0);
+                modelMatrix.rotate(-animProperties.flowerAngle*2, 0, 0, 1);
+                modelMatrix.translate(0.5, -0.5, 0); 
+                gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+                drawTrapezoid(gl);
+            }
         }
+    
     }
-
-
-    // modelMatrix.rotate(-animProperties.yOffset*100, 0, 0, 1);
-    // modelMatrix.translate(0.5, -0.5, 0); 
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // drawTrapezoid(gl);
-
-    // modelMatrix.translate(1, 0, 0)
-    // modelMatrix.translate(-0.5, 0.5, 0);
-    // modelMatrix.rotate(-animProperties.yOffset*100, 0, 0, 1);
-    // modelMatrix.translate(0.5, -0.5, 0); 
-    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
-    // drawTrapezoid(gl);
 }
 
 // Last time that this function was called:    (used for animation timing)
@@ -344,13 +358,13 @@ function animate(properties) {
     }
 
     var newY = properties.yVal;
-    if (Math.abs(xDiff) > 0.01) {
+    if (Math.abs(yDiff) > 0.01) {
         newY += 0.0003*elapsed*Math.sign(yDesired-properties.yVal);
     }
     
     // Calculate current state variables
     var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
-    var flowerAngle = (Math.sin(now/250) * 8.5) + 8.5;
+    var flowerAngle = (Math.sin(now/1000) * 8.5) + 8.5;
     var yOffset = Math.sin(now / 250) * 0.2;
     return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle};
 }
