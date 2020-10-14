@@ -27,6 +27,12 @@ var xDesired = 0.0;
 var yDesired = 0.0;
 var ratio = 1;
 
+// Generate random position for flowers
+var flowerPos = [];
+for (var i=0; i<16; i++) {
+    flowerPos.push(Math.random()*2-1);
+}
+
 function main() {
     window.addEventListener("mousedown", myMouseDown)
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
@@ -100,7 +106,7 @@ function mainLoop(vertData) {
     }
 
     // Current rotation angle
-    var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0};
+    var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0, flowerAngle: 0};
     // Model matrix
     var modelMatrix = new Matrix4();
 
@@ -184,6 +190,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     var aspect = gl.canvas.width / gl.canvas.height;
     modelMatrix.setIdentity();
     modelMatrix.scale(1,1,-1); // TODO figure out how to get the reverse depth buffering working
+    pushMatrix(modelMatrix);
     modelMatrix.translate(animProperties.xVal, animProperties.yVal, 0.0);    // 'set' means DISCARD old matrix,
 
     modelMatrix.scale(0.1,0.1*aspect,0.1);
@@ -282,6 +289,40 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
 
     gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
     drawTrapezoid(gl);
+
+    // DRAW FLOWERS
+    modelMatrix = popMatrix();
+    modelMatrix.translate(0.2, 0.2, -0.5);
+    modelMatrix.scale(0.05,0.05*aspect,0.05);
+    modelMatrix.rotate(-90, 1,0,0)
+
+    pushMatrix(modelMatrix);
+    for (var j=0; j<9; j++) {
+        modelMatrix = popMatrix();
+        modelMatrix.rotate(40, 0,1,0);
+        pushMatrix(modelMatrix);
+        for (var i=0; i<8; i++) {
+            modelMatrix.translate(1, 0, 0)
+            modelMatrix.translate(-0.5, 0.5, 0);
+            modelMatrix.rotate(-animProperties.flowerAngle, 0, 0, 1);
+            modelMatrix.translate(0.5, -0.5, 0); 
+            gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+            drawTrapezoid(gl);
+        }
+    }
+
+
+    // modelMatrix.rotate(-animProperties.yOffset*100, 0, 0, 1);
+    // modelMatrix.translate(0.5, -0.5, 0); 
+    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    // drawTrapezoid(gl);
+
+    // modelMatrix.translate(1, 0, 0)
+    // modelMatrix.translate(-0.5, 0.5, 0);
+    // modelMatrix.rotate(-animProperties.yOffset*100, 0, 0, 1);
+    // modelMatrix.translate(0.5, -0.5, 0); 
+    // gl.uniformMatrix4fv(u_ModelMatrix, false, modelMatrix.elements);
+    // drawTrapezoid(gl);
 }
 
 // Last time that this function was called:    (used for animation timing)
@@ -309,8 +350,9 @@ function animate(properties) {
     
     // Calculate current state variables
     var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
+    var flowerAngle = (Math.sin(now/250) * 8.5) + 8.5;
     var yOffset = Math.sin(now / 250) * 0.2;
-    return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY};
+    return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle};
 }
 
 function moreCCW() {
