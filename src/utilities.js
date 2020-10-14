@@ -154,3 +154,5 @@ function printVertProperties(vertices) {
     Z ${mins[2]} ${maxs[2]}`)
 
 }
+
+var lorem = 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. Mauris et dictum nunc. Curabitur vitae diam at metus vestibulum suscipit. Nam at magna elementum, placerat massa sit amet, scelerisque enim. Pellentesque ut sollicitudin tortor. Sed feugiat risus eros, ac tempor dui tempor scelerisque. Nulla eget gravida justo, sed volutpat purus. Duis neque libero, convallis ultrices iaculis at, auctor at nisl. Sed nunc magna, vestibulum quis augue id, maximus molestie lectus. Nulla rhoncus, mi vel tincidunt lobortis, ipsum leo ultricies lorem, tincidunt feugiat nibh leo a turpis. Donec aliquam nunc eu lacinia vehicula. Praesent mattis metus quis dolor aliquam pellentesque.'

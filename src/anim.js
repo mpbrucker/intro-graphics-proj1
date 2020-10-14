@@ -28,6 +28,7 @@ var yDesired = 0.0;
 var ratio = 1;
 var mouseDown = false;
 var flowerRotation = 0;
+var curLetter = 0;
 
 // Generate random position for flowers
 var flowerPos = [];
@@ -39,14 +40,21 @@ function main() {
     window.addEventListener("mousedown", myMouseDown)
     window.addEventListener("mouseup", myMouseUp)
     window.addEventListener("mousemove", myMouseMove)
-    window.addEventListener("keydown", myKeyDown, true);
+    window.addEventListener("keydown", myKeyDown, false);
     // loadOBJ('../obj/teapot.obj').then(data => mainLoop(data));
     var vertData = genTrapezoidPrism(1,0.7,1,1).concat(genTrianglePrism(1,1,1)); 
     mainLoop(vertData)
 }
 
-function myKeyDown() {
-    flowerRotation += 1;
+var loremText = document.getElementById('letters');
+loremText.innerHTML = lorem.substring(curLetter, curLetter+20);
+function myKeyDown(ev) {
+    ev.preventDefault();
+    if (ev.key == lorem.charAt(curLetter)) {
+        flowerRotation += 5;
+        curLetter +=1;
+        loremText.innerHTML = lorem.substring(curLetter, curLetter+20);
+    }
 }
 
 function myMouseUp(ev) {
@@ -72,7 +80,6 @@ function myMouseMove(ev) {
         var yDiff = yDesired - y+0.0001;
         ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
         if (ratio > 5 || ratio == 0) ratio = 5;
-        console.log(ratio)
     
         xDesired = x;
         yDesired = y;

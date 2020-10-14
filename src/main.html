@@ -7,19 +7,36 @@
 	<!--	Create the HTML5 'canvas' element in which we will run WebGL  -->
   <body onload="main()">
 	<style>
-		.panel-instructions {
+		div {
 			position: absolute;
 			color: #ffffff;
 			font-weight: bold;
+			user-select: none;
+		}
+		.panel-instructions {
 			font-size: 14px;
 			padding: 20px;
 			font-family: Arial, Helvetica, sans-serif;
+			user-select: none;
+		}
+		.letters {
+			font-size: 26px;
+			padding: 20px;
+			font-family: Arial, Helvetica, sans-serif;
+			top: 700px;
+			width: 800px;
+			text-align: center;
+
 		}
 	</style>
 	<div class="panel-instructions">
 		Instructions: Type the onscreen letters.
 		Click or hold mouse to move.
 	</div>
+	<div class="letters" id="letters">
+		asdf
+	</div>
+
     <canvas id="webgl" width="800" height="800">
     Please use a browser that supports "canvas"
     </canvas>
