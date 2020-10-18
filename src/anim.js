@@ -66,8 +66,9 @@ function myKeyDown(ev) {
 
 function myMouseUp(ev) {
     mouseDown = false;
+    yDrag = 0;
+    xDrag = 0;
     if (!hasMouseMoved) {
-        console.log('moving');
         moveAssembly(ev);
     }
 }
@@ -104,7 +105,7 @@ function moveAssembly(ev) {
 
 var g_canvas = document.getElementById('webgl');     
 function getStandardizedPos(ev) {
-    var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
+    var rect = g_canvas.getBoundingClientRect();	// get canvas corners in pixels
     var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
     var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
 
@@ -261,7 +262,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix = popMatrix();
     pushMatrix(modelMatrix);
     modelMatrix.translate(1,0,0); 
-    modelMatrix.rotate(animProperties.yOffset*100, 1, 0, 0);   
+    modelMatrix.rotate((animProperties.yOffset+yDrag)*100, 1, 0, 0);   
     pushMatrix(modelMatrix);
    
     modelMatrix.scale(0.6,1,1);
