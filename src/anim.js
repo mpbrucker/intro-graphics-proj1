@@ -31,6 +31,12 @@ var hasMouseMoved = false;
 var flowerRotation = 0;
 var curLetter = 0;
 
+// Mouse drag state vars
+var xDrag = 0;
+var yDrag = 0;
+var xDown = 0;
+var yDown = 0;
+
 // Generate random position for flowers
 var flowerPos = [];
 for (var i=0; i<16; i++) {
@@ -69,21 +75,24 @@ function myMouseUp(ev) {
 function myMouseDown(ev) {
     mouseDown = true;
     hasMouseMoved = false;
+    var pos = getStandardizedPos(ev);
+    xDown = pos[0];
+    yDown = pos[1];
 }
 
 function myMouseMove(ev) {
     hasMouseMoved = true;
+    if (mouseDown) {
+        var pos = getStandardizedPos(ev);
+        xDrag = pos[0] - xDown;
+        yDrag = pos[1] - yDown;
+    }
 }
 
-var g_canvas = document.getElementById('webgl');     
 function moveAssembly(ev) {
-    var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
-    var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
-    var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
-
-    var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
-    var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
-
+    var pos = getStandardizedPos(ev);
+    var x = pos[0];
+    var y = pos[1];
     var xDiff = xDesired - x;
     var yDiff = yDesired - y+0.0001;
     ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
@@ -92,6 +101,17 @@ function moveAssembly(ev) {
     xDesired = x;
     yDesired = y;
 };
+
+var g_canvas = document.getElementById('webgl');     
+function getStandardizedPos(ev) {
+    var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
+    var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
+    var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
+
+    var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
+    var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
+    return [x, y];
+}
 
 
 function mainLoop(vertData) {
