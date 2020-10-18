@@ -1,2 +1,0 @@
-
-loadOBJ('../obj/diamond.obj')
