@@ -27,6 +27,7 @@ var xDesired = 0.0;
 var yDesired = 0.0;
 var ratio = 1;
 var mouseDown = false;
+var hasMouseMoved = false;
 var flowerRotation = 0;
 var curLetter = 0;
 
@@ -59,31 +60,37 @@ function myKeyDown(ev) {
 
 function myMouseUp(ev) {
     mouseDown = false;
+    if (!hasMouseMoved) {
+        console.log('moving');
+        moveAssembly(ev);
+    }
 }
 
 function myMouseDown(ev) {
     mouseDown = true;
-    myMouseMove(ev);
+    hasMouseMoved = false;
+}
+
+function myMouseMove(ev) {
+    hasMouseMoved = true;
 }
 
 var g_canvas = document.getElementById('webgl');     
-function myMouseMove(ev) {
-    if (mouseDown) {
-        var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
-        var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
-        var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
-    
-        var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
-        var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
-    
-        var xDiff = xDesired - x;
-        var yDiff = yDesired - y+0.0001;
-        ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
-        if (ratio > 5 || ratio == 0) ratio = 5;
-    
-        xDesired = x;
-        yDesired = y;
-    }
+function moveAssembly(ev) {
+    var rect = ev.target.getBoundingClientRect();	// get canvas corners in pixels
+    var xp = ev.clientX - rect.left;									// x==0 at canvas left edge
+    var yp = g_canvas.height - (ev.clientY - rect.top);	// y==0 at canvas bottom edge
+
+    var x = (xp - g_canvas.width/2)  / 	(g_canvas.width/2);			// normalize canvas to -1 <= x < +1,
+    var y = (yp - g_canvas.height/2) /	(g_canvas.height/2);
+
+    var xDiff = xDesired - x;
+    var yDiff = yDesired - y+0.0001;
+    ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
+    if (ratio > 5 || ratio == 0) ratio = 5;
+
+    xDesired = x;
+    yDesired = y;
 };
 
 
@@ -372,7 +379,11 @@ function animate(properties) {
     // Calculate current state variables
     var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
     var flowerAngle = (Math.sin(now/1000) * 8.5) + 8.5;
-    var yOffset = Math.sin(now / 250) * 0.2;
+    if (!mouseDown) {
+        var yOffset = Math.sin(now / 250) * 0.2;
+    } else {
+        var yOffset = properties.yOffset;
+    }
     return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle};
 }
 
