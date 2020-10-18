@@ -23,13 +23,20 @@ var FSHADER_SOURCE =`
 
 // Global Variable -- Rotation angle rate (degrees/second)
 var ANGLE_STEP = 45.0;
-var xDesired = 0.0;
-var yDesired = 0.0;
+
+
 var ratio = 1;
 var mouseDown = false;
 var hasMouseMoved = false;
 var flowerRotation = 0;
 var curLetter = 0;
+
+// Assembly move state vars
+var xDesired = 0.0;
+var yDesired = 0.0;
+var xDiff = 0.0;
+var yDiff = 0.0;
+
 
 // Mouse drag state vars
 var xDrag = 0;
@@ -94,11 +101,6 @@ function moveAssembly(ev) {
     var pos = getStandardizedPos(ev);
     var x = pos[0];
     var y = pos[1];
-    var xDiff = xDesired - x;
-    var yDiff = yDesired - y+0.0001;
-    ratio = Math.abs(xDiff/yDiff); // Calculate the ratio for x-speed/y-speed
-    if (ratio > 5 || ratio == 0) ratio = 5;
-
     xDesired = x;
     yDesired = y;
 };
@@ -114,7 +116,8 @@ function getStandardizedPos(ev) {
     return [x, y];
 }
 
-
+// Current rotation angle
+var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0, flowerAngle: 0};
 function mainLoop(vertData) {
 //==============================================================================
     // Retrieve <canvas> element
@@ -160,8 +163,6 @@ function mainLoop(vertData) {
         return;
     }
 
-    // Current rotation angle
-    var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0, flowerAngle: 0};
     // Model matrix
     var modelMatrix = new Matrix4();
 
@@ -284,7 +285,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW RIGHT LEG SECOND LIMB
     modelMatrix = popMatrix();
     modelMatrix.translate(0,-1.5,0);
-    modelMatrix.rotate((0.2+animProperties.yOffset)*50, 0, 0, 1);
+    modelMatrix.rotate((0.2+animProperties.yOffset+xDrag)*50, 0, 0, 1);
  
     pushMatrix(modelMatrix);
     modelMatrix.scale(0.75,1.5,0.6);  
@@ -305,7 +306,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW LEFT LEG JOINT
     modelMatrix = popMatrix();
     modelMatrix.translate(-1,0,0); 
-    modelMatrix.rotate(-animProperties.yOffset*100, 1, 0, 0);   
+    modelMatrix.rotate(-(animProperties.yOffset+yDrag)*100, 1, 0, 0);   
     pushMatrix(modelMatrix);
    
     modelMatrix.scale(0.6,1,1);
@@ -327,7 +328,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW LEFT LEG SECOND LIMB
     modelMatrix = popMatrix();
     modelMatrix.translate(0,-1.5,0);
-    modelMatrix.rotate((0.2-animProperties.yOffset)*50, 0, 0, 1);
+    modelMatrix.rotate((0.2-(animProperties.yOffset+xDrag))*50, 0, 0, 1);
  
     pushMatrix(modelMatrix);
     modelMatrix.scale(0.75,1.5,0.6);  
@@ -389,12 +390,12 @@ function animate(properties) {
 
     var newX = properties.xVal;
     if (Math.abs(xDiff) > 0.01) {
-        newX += 0.0003*elapsed*Math.sign(xDesired-properties.xVal)*ratio;
+        newX += 0.001*elapsed*xDiff;
     }
 
     var newY = properties.yVal;
     if (Math.abs(yDiff) > 0.01) {
-        newY += 0.0003*elapsed*Math.sign(yDesired-properties.yVal);
+        newY += 0.001*elapsed*yDiff;
     }
     
     // Calculate current state variables
