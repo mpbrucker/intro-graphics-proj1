@@ -31,6 +31,8 @@ var hasMouseMoved = false;
 var flowerRotation = 0;
 var curLetter = 0;
 
+var maxLegAngle = 20;
+
 // Assembly move state vars
 var xDesired = 0.0;
 var yDesired = 0.0;
@@ -117,7 +119,7 @@ function getStandardizedPos(ev) {
 }
 
 // Current rotation angle
-var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0, flowerAngle: 0};
+var currentAnimProperties = {angle: 0.0, yOffset: 0.0, xVal: 0.0, yVal: 0.0, flowerAngle: 0, legAngle: 0};
 function mainLoop(vertData) {
 //==============================================================================
     // Retrieve <canvas> element
@@ -263,7 +265,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     modelMatrix = popMatrix();
     pushMatrix(modelMatrix);
     modelMatrix.translate(1,0,0); 
-    modelMatrix.rotate((animProperties.yOffset+yDrag)*100, 1, 0, 0);   
+    modelMatrix.rotate(animProperties.legAngle+(yDrag*100), 1, 0, 0);   
     pushMatrix(modelMatrix);
    
     modelMatrix.scale(0.6,1,1);
@@ -285,7 +287,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW RIGHT LEG SECOND LIMB
     modelMatrix = popMatrix();
     modelMatrix.translate(0,-1.5,0);
-    modelMatrix.rotate((0.2+animProperties.yOffset+xDrag)*50, 0, 0, 1);
+    modelMatrix.rotate(animProperties.legAngle+(maxLegAngle/2)+(xDrag*50), 0, 0, 1);
  
     pushMatrix(modelMatrix);
     modelMatrix.scale(0.75,1.5,0.6);  
@@ -306,7 +308,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW LEFT LEG JOINT
     modelMatrix = popMatrix();
     modelMatrix.translate(-1,0,0); 
-    modelMatrix.rotate(-(animProperties.yOffset+yDrag)*100, 1, 0, 0);   
+    modelMatrix.rotate(-(animProperties.legAngle)-(yDrag*100), 1, 0, 0);   
     pushMatrix(modelMatrix);
    
     modelMatrix.scale(0.6,1,1);
@@ -328,7 +330,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW LEFT LEG SECOND LIMB
     modelMatrix = popMatrix();
     modelMatrix.translate(0,-1.5,0);
-    modelMatrix.rotate((0.2-(animProperties.yOffset+xDrag))*50, 0, 0, 1);
+    modelMatrix.rotate(-(animProperties.legAngle)+(maxLegAngle/2)-(xDrag*50), 0, 0, 1);
  
     pushMatrix(modelMatrix);
     modelMatrix.scale(0.75,1.5,0.6);  
@@ -400,13 +402,14 @@ function animate(properties) {
     
     // Calculate current state variables
     var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
+    var newLegAngle = Math.sin(now / 400) * maxLegAngle;
     var flowerAngle = (Math.sin(now/1000) * 8.5) + 8.5;
     if (!mouseDown) {
         var yOffset = Math.sin(now / 250) * 0.2;
     } else {
         var yOffset = properties.yOffset;
     }
-    return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle};
+    return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle, legAngle: newLegAngle};
 }
 
 function moreCCW() {
