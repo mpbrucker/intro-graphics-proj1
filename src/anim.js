@@ -29,9 +29,18 @@ var flowerRotation = 0;
 var curLetter = 0;
 
 // Animation variables for Dat.GUI
-var maxLegAngle = 20;
-var angleStep = 45.0;
-var walkSpeed = 2;
+// var maxLegAngle = 20;
+// var angleStep = 45.0;
+// var walkSpeed = 2;
+
+var animVars = { maxLegAngle: 20, angleStep: 45, walkSpeed: 1 };
+var gui = new dat.GUI();
+gui.add(animVars, 'maxLegAngle', 0, 90, 1);
+gui.add(animVars, 'angleStep', 0, 400);
+gui.add(animVars, 'walkSpeed', 1, 10, 0.1);
+
+
+
 
 
 // Assembly move state vars
@@ -288,7 +297,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW RIGHT LEG SECOND LIMB
     modelMatrix = popMatrix();
     modelMatrix.translate(0,-1.5,0);
-    modelMatrix.rotate(animProperties.legAngle+(maxLegAngle/2)+(xDrag*50), 0, 0, 1);
+    modelMatrix.rotate(animProperties.legAngle+(animVars.maxLegAngle/2)+(xDrag*50), 0, 0, 1);
  
     pushMatrix(modelMatrix);
     modelMatrix.scale(0.75,1.5,0.6);  
@@ -331,7 +340,7 @@ function draw(gl, n, animProperties, modelMatrix, u_ModelMatrix) {
     // DRAW LEFT LEG SECOND LIMB
     modelMatrix = popMatrix();
     modelMatrix.translate(0,-1.5,0);
-    modelMatrix.rotate(-(animProperties.legAngle)+(maxLegAngle/2)-(xDrag*50), 0, 0, 1);
+    modelMatrix.rotate(-(animProperties.legAngle)+(animVars.maxLegAngle/2)-(xDrag*50), 0, 0, 1);
  
     pushMatrix(modelMatrix);
     modelMatrix.scale(0.75,1.5,0.6);  
@@ -402,13 +411,14 @@ function animate(properties) {
     }
     
     // Calculate current state variables
-    var newAngle = properties.angle + (angleStep * elapsed) / 1000.0;
-    var newLegAngle = Math.sin(now * (walkSpeed/ 400)) * maxLegAngle;
+    var newAngle = properties.angle + (animVars.angleStep * elapsed) / 1000.0;
     var flowerAngle = (Math.sin(now / 1000) * 8.5) + 8.5;
     if (!mouseDown) {
         var yOffset = Math.sin(now / 250) * 0.2;
+        var newLegAngle = Math.sin(now * (animVars.walkSpeed/ 400)) * animVars.maxLegAngle;
     } else {
         var yOffset = properties.yOffset;
+        var newLegAngle = properties.legAngle;
     }
     return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle, legAngle: newLegAngle};
 }
