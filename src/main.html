@@ -7,7 +7,7 @@
 	<!--	Create the HTML5 'canvas' element in which we will run WebGL  -->
   <body onload="main()">
 	<style>
-		div {
+		div.instructions {
 			position: absolute;
 			color: #ffffff;
 			font-weight: bold;
@@ -26,20 +26,24 @@
 			top: 500px;
 			width: 600px;
 			text-align: center;
-
+		}
+		#gui {
+			position: absolute;
+			top: 0;
+			right: 0;
 		}
 	</style>
-	<div class="panel-instructions">
+	<div class="panel-instructions instructions">
 		Instructions: Type the onscreen letters. <br>
 		Click to move. Click and drag the mouse to change the angle of the leg joints.
 	</div>
-	<div class="letters" id="letters">
+	<div class="letters instructions" id="letters">
 		asdf
 	</div>
 
     <canvas id="webgl" width="600" height="600">
     Please use a browser that supports "canvas"
-    </canvas>
+	</canvas>
 
 	<!--	Load in the JavaScript libraries supplied by our textbook 
 			(Matsuda et al., 2013 WebGL Programming Guide) that help us

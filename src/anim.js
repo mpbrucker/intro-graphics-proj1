@@ -35,6 +35,7 @@ var curLetter = 0;
 
 var animVars = { maxLegAngle: 20, angleStep: 45, walkSpeed: 1 };
 var gui = new dat.GUI();
+gui.domElement.id = 'gui';
 gui.add(animVars, 'maxLegAngle', 0, 90, 1);
 gui.add(animVars, 'angleStep', 0, 400);
 gui.add(animVars, 'walkSpeed', 1, 10, 0.1);
@@ -92,12 +93,15 @@ function myMouseUp(ev) {
     }
 }
 
+var body = document.getElementsByTagName("body")[0];
 function myMouseDown(ev) {
-    mouseDown = true;
-    hasMouseMoved = false;
-    var pos = getStandardizedPos(ev);
-    xDown = pos[0];
-    yDown = pos[1];
+    if (ev.target.parentElement == body) {
+        mouseDown = true;
+        hasMouseMoved = false;
+        var pos = getStandardizedPos(ev);
+        xDown = pos[0];
+        yDown = pos[1];    
+    }
 }
 
 function myMouseMove(ev) {
