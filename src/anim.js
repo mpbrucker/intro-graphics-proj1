@@ -22,16 +22,17 @@ var FSHADER_SOURCE =`
 
 
 // Global Variable -- Rotation angle rate (degrees/second)
-var ANGLE_STEP = 45.0;
-
-
 var ratio = 1;
 var mouseDown = false;
 var hasMouseMoved = false;
 var flowerRotation = 0;
 var curLetter = 0;
 
+// Animation variables for Dat.GUI
 var maxLegAngle = 20;
+var angleStep = 45.0;
+var walkSpeed = 2;
+
 
 // Assembly move state vars
 var xDesired = 0.0;
@@ -401,24 +402,13 @@ function animate(properties) {
     }
     
     // Calculate current state variables
-    var newAngle = properties.angle + (ANGLE_STEP * elapsed) / 1000.0;
-    var newLegAngle = Math.sin(now / 400) * maxLegAngle;
-    var flowerAngle = (Math.sin(now/1000) * 8.5) + 8.5;
+    var newAngle = properties.angle + (angleStep * elapsed) / 1000.0;
+    var newLegAngle = Math.sin(now * (walkSpeed/ 400)) * maxLegAngle;
+    var flowerAngle = (Math.sin(now / 1000) * 8.5) + 8.5;
     if (!mouseDown) {
         var yOffset = Math.sin(now / 250) * 0.2;
     } else {
         var yOffset = properties.yOffset;
     }
     return {angle: newAngle % 360, yOffset: yOffset, xVal: newX, yVal: newY, flowerAngle: flowerAngle, legAngle: newLegAngle};
-}
-
-function moreCCW() {
-//==============================================================================
-
-    ANGLE_STEP += 10; 
-}
-
-function lessCCW() {
-//==============================================================================
-    ANGLE_STEP -= 10; 
 }
